@@ -1,10 +1,13 @@
 package game
 
-import "rpg-tutorial/scenes"
+import (
+	"log"
+	"rpg-tutorial/scenes"
+)
 
 type Game struct {
-	sceneMap      map[scenes.SceneId]scenes.Scene
-	activeSceneId scenes.SceneId
+	sceneMap map[scenes.SceneId]scenes.Scene
+	current  scenes.Scene
 }
 
 func NewGame() *Game {
@@ -14,9 +17,13 @@ func NewGame() *Game {
 		scenes.PauseSceneId: scenes.NewPauseScene(),
 	}
 	activeSceneId := scenes.StartSceneId
-	sceneMap[activeSceneId].FirstLoad()
+	for _, s := range sceneMap {
+		if err := sceneMap[s.ID()].Init(); err != nil {
+			log.Fatal(err)
+		}
+	}
 	return &Game{
-		sceneMap,
-		activeSceneId,
+		sceneMap: sceneMap,
+		current:  sceneMap[activeSceneId],
 	}
 }
