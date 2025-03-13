@@ -9,12 +9,18 @@ import (
 )
 
 type StartScene struct {
-	loaded bool
+	scene
 }
+
+var _ Scene = (*StartScene)(nil)
 
 func NewStartScene() *StartScene {
 	return &StartScene{
-		loaded: false,
+		scene: scene{
+			loaded: false,
+			id:     StartSceneId,
+			next:   StartSceneId,
+		},
 	}
 }
 
@@ -23,26 +29,41 @@ func (s *StartScene) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "Press enter to start.")
 }
 
-func (s *StartScene) FirstLoad() {
+func (s *StartScene) Init() error {
 	s.loaded = true
+	return nil
 }
 
 func (s *StartScene) IsLoaded() bool {
 	return s.loaded
 }
 
-func (s *StartScene) OnEnter() {
+func (s *StartScene) OnEnter() error {
+	return nil
 }
 
-func (s *StartScene) OnExit() {
+func (s *StartScene) OnExit() error {
+	return nil
 }
 
-func (s *StartScene) Update() SceneId {
+func (s *StartScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		return GameSceneId
+		s.next = GameSceneId
+		return nil
 	}
 
-	return StartSceneId
+	s.next = StartSceneId
+	return nil
 }
 
-var _ Scene = (*StartScene)(nil)
+func (s *StartScene) ID() SceneId {
+	return s.id
+}
+
+func (s *StartScene) Next() SceneId {
+	return s.next
+}
+
+func (s *StartScene) SetFreezeFrame(screen *ebiten.Image) {
+	s.freezeFrame = screen
+}

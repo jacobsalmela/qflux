@@ -9,12 +9,18 @@ import (
 )
 
 type PauseScene struct {
-	loaded bool
+	scene
 }
+
+var _ Scene = (*PauseScene)(nil)
 
 func NewPauseScene() *PauseScene {
 	return &PauseScene{
-		loaded: false,
+		scene: scene{
+			loaded: false,
+			id:     PauseSceneId,
+			next:   PauseSceneId,
+		},
 	}
 }
 
@@ -23,26 +29,41 @@ func (s *PauseScene) Draw(screen *ebiten.Image) {
 	ebitenutil.DebugPrint(screen, "Press enter to unpause.")
 }
 
-func (s *PauseScene) FirstLoad() {
+func (s *PauseScene) Init() error {
 	s.loaded = true
+	return nil
 }
 
 func (s *PauseScene) IsLoaded() bool {
 	return s.loaded
 }
 
-func (s *PauseScene) OnEnter() {
+func (s *PauseScene) OnEnter() error {
+	return nil
 }
 
-func (s *PauseScene) OnExit() {
+func (s *PauseScene) OnExit() error {
+	return nil
 }
 
-func (s *PauseScene) Update() SceneId {
+func (s *PauseScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		return GameSceneId
+		s.next = GameSceneId
+		return nil
 	}
 
-	return PauseSceneId
+	s.next = PauseSceneId
+	return nil
 }
 
-var _ Scene = (*PauseScene)(nil)
+func (s *PauseScene) ID() SceneId {
+	return s.id
+}
+
+func (s *PauseScene) Next() SceneId {
+	return s.next
+}
+
+func (s *PauseScene) SetFreezeFrame(screen *ebiten.Image) {
+	s.freezeFrame = screen
+}

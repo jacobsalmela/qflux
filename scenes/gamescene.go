@@ -23,7 +23,7 @@ import (
 )
 
 type GameScene struct {
-	loaded            bool
+	scene
 	player            *entities.Player
 	playerSpriteSheet *spritesheet.SpriteSheet
 	enemies           []*entities.Enemy
@@ -34,6 +34,8 @@ type GameScene struct {
 	cam               *camera.Camera
 	colliders         []image.Rectangle
 }
+
+var _ Scene = (*GameScene)(nil)
 
 func NewGameScene() *GameScene {
 	return &GameScene{
@@ -46,22 +48,26 @@ func NewGameScene() *GameScene {
 		tilemapImg:        nil,
 		cam:               nil,
 		colliders:         make([]image.Rectangle, 0),
-		loaded:            false,
+		scene: scene{
+			loaded: false,
+			id:     GameSceneId,
+			next:   GameSceneId,
+		},
 	}
 }
 
-func (g *GameScene) IsLoaded() bool {
-	return g.loaded
+func (s *GameScene) IsLoaded() bool {
+	return s.loaded
 }
 
-func (g *GameScene) Draw(screen *ebiten.Image) {
+func (s *GameScene) Draw(screen *ebiten.Image) {
 	// fill the screen with a nice sky color
 	screen.Fill(color.RGBA{120, 180, 255, 255})
 
 	opts := ebiten.DrawImageOptions{}
 
 	// loop over the layers
-	for layerIndex, layer := range g.tilemapJSON.Layers {
+	for layerIndex, layer := range s.tilemapJSON.Layers {
 		// loop over the tiles in the layer data
 		for index, id := range layer.Data {
 
@@ -77,13 +83,13 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 			x *= constants.Tilesize
 			y *= constants.Tilesize
 
-			img := g.tilesets[layerIndex].Img(id)
+			img := s.tilesets[layerIndex].Img(id)
 
 			opts.GeoM.Translate(float64(x), float64(y))
 
 			opts.GeoM.Translate(0.0, -(float64(img.Bounds().Dy()) + constants.Tilesize))
 
-			opts.GeoM.Translate(g.cam.X, g.cam.Y)
+			opts.GeoM.Translate(s.cam.X, s.cam.Y)
 
 			screen.DrawImage(img, &opts)
 
@@ -93,11 +99,11 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 	}
 
 	// set the translation of our drawImageOptions to the player's position
-	opts.GeoM.Translate(g.player.X, g.player.Y)
-	opts.GeoM.Translate(g.cam.X, g.cam.Y)
+	opts.GeoM.Translate(s.player.X, s.player.Y)
+	opts.GeoM.Translate(s.cam.X, s.cam.Y)
 
 	playerFrame := 0
-	activeAnim := g.player.ActiveAnimation(int(g.player.Dx), int(g.player.Dy))
+	activeAnim := s.player.ActiveAnimation(int(s.player.Dx), int(s.player.Dy))
 	if activeAnim != nil {
 		playerFrame = activeAnim.Frame()
 	}
@@ -105,17 +111,17 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 	// draw the player
 	screen.DrawImage(
 		// grab a subimage of the spritesheet
-		g.player.Img.SubImage(
-			g.playerSpriteSheet.Rect(playerFrame),
+		s.player.Img.SubImage(
+			s.playerSpriteSheet.Rect(playerFrame),
 		).(*ebiten.Image),
 		&opts,
 	)
 
 	opts.GeoM.Reset()
 
-	for _, sprite := range g.enemies {
+	for _, sprite := range s.enemies {
 		opts.GeoM.Translate(sprite.X, sprite.Y)
-		opts.GeoM.Translate(g.cam.X, g.cam.Y)
+		opts.GeoM.Translate(s.cam.X, s.cam.Y)
 
 		screen.DrawImage(
 			sprite.Img.SubImage(
@@ -129,9 +135,9 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 
 	opts.GeoM.Reset()
 
-	for _, sprite := range g.potions {
+	for _, sprite := range s.potions {
 		opts.GeoM.Translate(sprite.X, sprite.Y)
-		opts.GeoM.Translate(g.cam.X, g.cam.Y)
+		opts.GeoM.Translate(s.cam.X, s.cam.Y)
 
 		screen.DrawImage(
 			sprite.Img.SubImage(
@@ -143,11 +149,11 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 		opts.GeoM.Reset()
 	}
 
-	for _, collider := range g.colliders {
+	for _, collider := range s.colliders {
 		vector.StrokeRect(
 			screen,
-			float32(collider.Min.X)+float32(g.cam.X),
-			float32(collider.Min.Y)+float32(g.cam.Y),
+			float32(collider.Min.X)+float32(s.cam.X),
+			float32(collider.Min.Y)+float32(s.cam.Y),
 			float32(collider.Dx()),
 			float32(collider.Dy()),
 			1.0,
@@ -157,7 +163,7 @@ func (g *GameScene) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (g *GameScene) FirstLoad() {
+func (s *GameScene) Init() error {
 	// load the image from file
 	playerImg, _, err := ebitenutil.NewImageFromFile("assets/images/ninja.png")
 	if err != nil {
@@ -195,7 +201,7 @@ func (g *GameScene) FirstLoad() {
 
 	playerSpriteSheet := spritesheet.NewSpriteSheet(4, 7, constants.Tilesize)
 
-	g.player = &entities.Player{
+	s.player = &entities.Player{
 		Sprite: &entities.Sprite{
 			Img: playerImg,
 			X:   50.0,
@@ -211,9 +217,9 @@ func (g *GameScene) FirstLoad() {
 		CombatComp: components.NewBasicCombat(3, 1),
 	}
 
-	g.playerSpriteSheet = playerSpriteSheet
+	s.playerSpriteSheet = playerSpriteSheet
 
-	g.enemies = []*entities.Enemy{
+	s.enemies = []*entities.Enemy{
 		{
 			Sprite: &entities.Sprite{
 				Img: skeletonImg,
@@ -233,14 +239,14 @@ func (g *GameScene) FirstLoad() {
 			CombatComp:    components.NewEnemyCombat(3, 1, 30),
 		},
 	}
-	g.tilemapJSON = tilemapJSON
-	g.tilesets = tilesets
-	g.tilemapImg = tilemapImg
-	g.cam = camera.NewCamera(0.0, 0.0)
-	g.colliders = []image.Rectangle{
+	s.tilemapJSON = tilemapJSON
+	s.tilesets = tilesets
+	s.tilemapImg = tilemapImg
+	s.cam = camera.NewCamera(0.0, 0.0)
+	s.colliders = []image.Rectangle{
 		image.Rect(100, 100, 116, 16),
 	}
-	g.potions = []*entities.Potion{
+	s.potions = []*entities.Potion{
 		{
 			Sprite: &entities.Sprite{
 				Img: potionImg,
@@ -250,95 +256,100 @@ func (g *GameScene) FirstLoad() {
 			AmtHeal: 1.0,
 		},
 	}
-	g.loaded = true
+	s.loaded = true
+	return nil
 }
 
-func (g *GameScene) OnEnter() {
+func (s *GameScene) OnEnter() error {
+	return nil
 }
 
-func (g *GameScene) OnExit() {
+func (s *GameScene) OnExit() error {
+	return nil
 }
 
-func (g *GameScene) Update() SceneId {
+func (s *GameScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-		return ExitSceneId
+		s.next = ExitSceneId
+		return nil
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		return PauseSceneId
+		s.next = PauseSceneId
+		return nil
 	}
 	// move the player based on keyboar input (left, right, up down)
 
-	g.player.Dx = 0.0
-	g.player.Dy = 0.0
+	s.player.Dx = 0.0
+	s.player.Dy = 0.0
 
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		g.player.Dx = -2
+		s.player.Dx = -2
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		g.player.Dx = 2
+		s.player.Dx = 2
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		g.player.Dy = -2
+		s.player.Dy = -2
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		g.player.Dy = 2
+		s.player.Dy = 2
 	}
 
-	g.player.X += g.player.Dx
+	s.player.X += s.player.Dx
 
-	CheckCollisionHorizontal(g.player.Sprite, g.colliders)
+	CheckCollisionHorizontal(s.player.Sprite, s.colliders)
 
-	g.player.Y += g.player.Dy
+	s.player.Y += s.player.Dy
 
-	CheckCollisionVertical(g.player.Sprite, g.colliders)
+	CheckCollisionVertical(s.player.Sprite, s.colliders)
 
-	activeAnim := g.player.ActiveAnimation(int(g.player.Dx), int(g.player.Dy))
+	activeAnim := s.player.ActiveAnimation(int(s.player.Dx), int(s.player.Dy))
 	if activeAnim != nil {
 		activeAnim.Update()
 	}
 
 	// add behavior to the enemies
-	for _, sprite := range g.enemies {
+	for _, sprite := range s.enemies {
 
 		sprite.Dx = 0.0
 		sprite.Dy = 0.0
 
 		if sprite.FollowsPlayer {
-			if sprite.X < g.player.X {
+			if sprite.X < s.player.X {
 				sprite.Dx += 1
-			} else if sprite.X > g.player.X {
+			} else if sprite.X > s.player.X {
 				sprite.Dx -= 1
 			}
-			if sprite.Y < g.player.Y {
+			if sprite.Y < s.player.Y {
 				sprite.Dy += 1
-			} else if sprite.Y > g.player.Y {
+			} else if sprite.Y > s.player.Y {
 				sprite.Dy -= 1
 			}
 		}
 
 		sprite.X += sprite.Dx
 
-		CheckCollisionHorizontal(sprite.Sprite, g.colliders)
+		CheckCollisionHorizontal(sprite.Sprite, s.colliders)
 
 		sprite.Y += sprite.Dy
 
-		CheckCollisionVertical(sprite.Sprite, g.colliders)
+		CheckCollisionVertical(sprite.Sprite, s.colliders)
 	}
 
 	clicked := inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0)
 	cX, cY := ebiten.CursorPosition()
-	cX -= int(g.cam.X)
-	cY -= int(g.cam.Y)
-	g.player.CombatComp.Update()
+	cX -= int(s.cam.X)
+	cY -= int(s.cam.Y)
+	s.player.CombatComp.Update()
 	pRect := image.Rect(
-		int(g.player.X),
-		int(g.player.Y),
-		int(g.player.X)+constants.Tilesize,
-		int(g.player.Y)+constants.Tilesize,
+		int(s.player.X),
+		int(s.player.Y),
+		int(s.player.X)+constants.Tilesize,
+		int(s.player.Y)+constants.Tilesize,
 	)
 
 	deadEnemies := make(map[int]struct{})
-	for index, enemy := range g.enemies {
+	for index, enemy := range s.enemies {
 		enemy.CombatComp.Update()
 		rect := image.Rect(
 			int(enemy.X),
@@ -350,11 +361,11 @@ func (g *GameScene) Update() SceneId {
 		// if enemy overlaps player
 		if rect.Overlaps(pRect) {
 			if enemy.CombatComp.Attack() {
-				g.player.CombatComp.Damage(enemy.CombatComp.AttackPower())
+				s.player.CombatComp.Damage(enemy.CombatComp.AttackPower())
 				fmt.Println(
-					fmt.Sprintf("player damaged. health: %d\n", g.player.CombatComp.Health()),
+					fmt.Sprintf("player damaged. health: %d\n", s.player.CombatComp.Health()),
 				)
-				if g.player.CombatComp.Health() <= 0 {
+				if s.player.CombatComp.Health() <= 0 {
 					fmt.Println("player has died!")
 				}
 			}
@@ -365,15 +376,15 @@ func (g *GameScene) Update() SceneId {
 			if clicked &&
 				math.Sqrt(
 					math.Pow(
-						float64(cX)-g.player.X+(constants.Tilesize/2),
+						float64(cX)-s.player.X+(constants.Tilesize/2),
 						2,
 					)+math.Pow(
-						float64(cY)-g.player.Y+(constants.Tilesize/2),
+						float64(cY)-s.player.Y+(constants.Tilesize/2),
 						2,
 					),
 				) < constants.Tilesize*5 {
 				fmt.Println("damaging enemy")
-				enemy.CombatComp.Damage(g.player.CombatComp.AttackPower())
+				enemy.CombatComp.Damage(s.player.CombatComp.AttackPower())
 
 				if enemy.CombatComp.Health() <= 0 {
 					deadEnemies[index] = struct{}{}
@@ -384,34 +395,45 @@ func (g *GameScene) Update() SceneId {
 	}
 	if len(deadEnemies) > 0 {
 		newEnemies := make([]*entities.Enemy, 0)
-		for index, enemy := range g.enemies {
+		for index, enemy := range s.enemies {
 			if _, exists := deadEnemies[index]; !exists {
 				newEnemies = append(newEnemies, enemy)
 			}
 		}
-		g.enemies = newEnemies
+		s.enemies = newEnemies
 	}
 
 	// handle simple potion functionality
-	// for _, potion := range g.potions {
-	// 	if g.player.X > potion.X {
-	// 		g.player.Health += potion.AmtHeal
-	// 		fmt.Printf("Picked up potion! Health: %d\n", g.player.Health)
+	// for _, potion := range s.potions {
+	// 	if s.player.X > potion.X {
+	// 		s.player.Health += potion.AmtHeal
+	// 		fmt.Printf("Picked up potion! Health: %d\n", s.player.Health)
 	// 	}
 	// }
 
-	g.cam.FollowTarget(g.player.X+8, g.player.Y+8, 320, 240)
-	g.cam.Constrain(
-		float64(g.tilemapJSON.Layers[0].Width)*constants.Tilesize,
-		float64(g.tilemapJSON.Layers[0].Height)*constants.Tilesize,
+	s.cam.FollowTarget(s.player.X+8, s.player.Y+8, 320, 240)
+	s.cam.Constrain(
+		float64(s.tilemapJSON.Layers[0].Width)*constants.Tilesize,
+		float64(s.tilemapJSON.Layers[0].Height)*constants.Tilesize,
 		320,
 		240,
 	)
 
-	return GameSceneId
+	s.next = GameSceneId
+	return nil
 }
 
-var _ Scene = (*GameScene)(nil)
+func (s *GameScene) ID() SceneId {
+	return s.id
+}
+
+func (s *GameScene) Next() SceneId {
+	return s.next
+}
+
+func (s *GameScene) SetFreezeFrame(screen *ebiten.Image) {
+	s.freezeFrame = screen
+}
 
 func CheckCollisionHorizontal(sprite *entities.Sprite, colliders []image.Rectangle) {
 	for _, collider := range colliders {

@@ -11,11 +11,21 @@ const (
 	ExitSceneId
 )
 
+type scene struct {
+	loaded      bool
+	id          SceneId
+	next        SceneId
+	freezeFrame *ebiten.Image
+}
+
 type Scene interface {
-	Update() SceneId
+	Update() error
 	Draw(screen *ebiten.Image)
-	FirstLoad()
-	OnEnter()
-	OnExit()
+	Init() error
+	OnEnter() error
+	OnExit() error
 	IsLoaded() bool
+	ID() SceneId
+	Next() SceneId
+	SetFreezeFrame(screen *ebiten.Image)
 }
