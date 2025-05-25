@@ -269,6 +269,11 @@ func (s *GameScene) OnExit() error {
 }
 
 func (s *GameScene) Update() error {
+	// "T" will temporarily trigger a game over
+	if inpututil.IsKeyJustPressed(ebiten.KeyT) {
+		s.next = GameOverSceneId
+		return nil
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
 		s.next = ExitSceneId
 		return nil
