@@ -1,6 +1,10 @@
 package scenes
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"rpg-tutorial/menu"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type SceneId uint
 
@@ -12,6 +16,12 @@ const (
 	PauseSceneId
 	ExitSceneId
 	GameOverSceneId
+	SettingsId
+	HighScoresId
+	DifficultyId
+	ControlsId
+	AudioVideoId
+	AccessibilityId
 )
 
 type scene struct {
@@ -19,6 +29,7 @@ type scene struct {
 	id          SceneId
 	next        SceneId
 	freezeFrame *ebiten.Image
+	menu        *menu.Menu
 }
 
 type Scene interface {

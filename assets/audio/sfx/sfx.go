@@ -14,6 +14,8 @@ import (
 )
 
 var (
+	Pause        = exampleaudio.Jab8_wav
+	Menu_Select  = exampleaudio.Jab8_wav
 	Menu_Confirm = exampleaudio.Jab8_wav
 	// uncomment to replace the above and add your own file
 	////go:embed "Menu Confirm.wav"
@@ -32,7 +34,9 @@ type Sound struct {
 func Init() {
 	Sounds = make(map[string]*Sound)
 	assets := map[string][]byte{
-		"Pause": Menu_Confirm,
+		"Pause":        Pause,
+		"Menu Select":  Menu_Select,
+		"Menu Confirm": Menu_Confirm,
 	}
 
 	for name, data := range assets {

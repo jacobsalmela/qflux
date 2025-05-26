@@ -1,8 +1,10 @@
 package scenes
 
 import (
+	"rpg-tutorial/assets/audio/sfx"
+	"rpg-tutorial/menu"
+
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type TitleScene struct {
@@ -13,16 +15,34 @@ type TitleScene struct {
 var _ Scene = (*TitleScene)(nil)
 
 func NewTitleScene() *TitleScene {
-	return &TitleScene{
+	s := &TitleScene{
 		scene: scene{
 			loaded: false,
 			id:     TitleSceneId,
 			next:   TitleSceneId,
 		},
 	}
+
+	s.menu = &menu.Menu{
+		Items: []menu.MenuItem{
+			{Label: "New Game", Action: func() { s.next = GameSceneId }},
+			{Label: "Settings", Action: func() { s.next = SettingsId }},
+			{Label: "High Scores", Action: func() { s.next = HighScoresId }},
+		},
+		Index: menu.NewGame,
+	}
+
+	return s
 }
 
 func (s *TitleScene) Init() error {
+	// TODO: Loop and init all sfx
+	if err := sfx.Sounds["Menu Select"].Init(); err != nil {
+		return err
+	}
+	if err := sfx.Sounds["Menu Confirm"].Init(); err != nil {
+		return err
+	}
 	s.loaded = true
 	return nil
 }
@@ -36,17 +56,6 @@ func (s *TitleScene) OnEnter() error {
 }
 
 func (s *TitleScene) OnExit() error {
-	return nil
-}
-
-func (s *TitleScene) Update() error {
-	s.elapsed += 0.1
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.next = GameSceneId
-		return nil
-	}
-
-	s.next = TitleSceneId
 	return nil
 }
 
