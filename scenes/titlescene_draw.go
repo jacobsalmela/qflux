@@ -9,6 +9,10 @@ import (
 )
 
 func (s *TitleScene) Draw(screen *ebiten.Image) {
+	screen.Fill(s.calculateBgColor())
+	for _, star := range s.stars {
+		star.Draw(screen)
+	}
 	s.drawTitle(screen)
 	s.drawMenu(screen)
 }

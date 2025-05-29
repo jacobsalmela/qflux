@@ -46,6 +46,7 @@ func (s *GameOverScene) Update() error {
 		return nil
 	}
 
+	s.elapsed += 0.6
 	s.next = GameOverSceneId
 	return nil
 }

@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"image/color"
 	"rpg-tutorial/assets/audio/sfx"
 	"rpg-tutorial/menu"
 
@@ -10,6 +11,14 @@ import (
 type TitleScene struct {
 	scene
 	elapsed float64
+	stars   []*Star
+}
+
+type Star struct {
+	X, Y   float64
+	Dx, Dy float64
+	Shape  string // plus, square
+	Clr    color.Color
 }
 
 var _ Scene = (*TitleScene)(nil)
@@ -31,6 +40,8 @@ func NewTitleScene() *TitleScene {
 		},
 		Index: menu.NewGame,
 	}
+
+	s.stars = initStars(50, 320, 240) // 50 stars within screen dimensions
 
 	return s
 }
