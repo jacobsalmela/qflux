@@ -3,7 +3,7 @@ package entities
 import "rpg-tutorial/components"
 
 type Enemy struct {
-	*Sprite
+	*Entity
 	FollowsPlayer bool
 	CombatComp    *components.EnemyCombat
 }

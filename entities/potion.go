@@ -1,6 +1,6 @@
 package entities
 
 type Potion struct {
-	*Sprite
+	*Entity
 	AmtHeal uint
 }
