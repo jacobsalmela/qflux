@@ -1,0 +1,46 @@
+name: build and bublish go binary
+
+on:
+  push:
+    # any tag (you can constrain to v* if you prefer semantic-version tags)
+    tags:
+      - 'v0.0.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check out source
+        uses: actions/checkout@v4
+
+      - name: set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: build binary
+        run: |
+          mkdir -p bin
+          go build -o bin/qflux ./...
+
+      - name: create github release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          # Use the tag that triggered this workflow
+          tag_name: ${{ github.ref_name }}
+          # If the release already exists, this will update it instead of failing
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          # github-token is provided automatically as a secret
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: upload binary to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/qflux
+          asset_name: qflux-${{ github.ref_name }}-linux-amd64
+          asset_content_type: application/octet-stream
