@@ -3,7 +3,7 @@ package menu
 import (
 	"image/color"
 	"log"
-	"rpg-tutorial/assets/audio/sfx"
+	"qflux/assets/audio/sfx"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"

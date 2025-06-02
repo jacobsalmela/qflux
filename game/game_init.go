@@ -2,10 +2,10 @@ package game
 
 import (
 	"fmt"
-	"rpg-tutorial/assets/audio"
-	"rpg-tutorial/assets/audio/music"
-	"rpg-tutorial/assets/audio/sfx"
-	"rpg-tutorial/assets/fonts"
+	"qflux/assets/audio"
+	"qflux/assets/audio/music"
+	"qflux/assets/audio/sfx"
+	"qflux/assets/fonts"
 )
 
 func init() {

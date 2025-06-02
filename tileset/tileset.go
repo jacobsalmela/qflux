@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 
-	"rpg-tutorial/constants"
+	"qflux/constants"
 )
 
 // every tileset must be able to give an image given an id

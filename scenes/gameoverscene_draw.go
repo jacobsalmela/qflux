@@ -2,7 +2,8 @@ package scenes
 
 import (
 	"image"
-	"rpg-tutorial/assets/fonts"
+	"qflux/assets/fonts"
+	"qflux/pkg/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -19,7 +20,7 @@ func (s *GameOverScene) drawGameOverText(screen *ebiten.Image) {
 	top.PrimaryAlign = text.AlignCenter
 	top.SecondaryAlign = text.AlignCenter
 	top.GeoM.Reset()
-	top.GeoM.Translate(320/2, 240/2)
+	top.GeoM.Translate(config.ScreenWidth/2, config.ScreenHeight/2)
 	text.Draw(screen, label, fonts.CommonFontFace, top)
 }
 

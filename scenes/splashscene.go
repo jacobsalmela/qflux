@@ -2,7 +2,7 @@ package scenes
 
 import (
 	"bytes"
-	"rpg-tutorial/assets/images/thirdparty"
+	"qflux/assets/images/thirdparty"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"

@@ -2,7 +2,7 @@ package game
 
 import (
 	"log"
-	"rpg-tutorial/scenes"
+	"qflux/scenes"
 )
 
 type Game struct {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"rpg-tutorial/tileset"
+	"qflux/tileset"
 )
 
 // data we want for one layer in our list of layers

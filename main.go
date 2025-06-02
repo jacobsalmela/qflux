@@ -2,14 +2,15 @@ package main
 
 import (
 	"log"
-	"rpg-tutorial/game"
+	"qflux/game"
+	"qflux/pkg/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
-	ebiten.SetWindowSize(320, 240)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
+	ebiten.SetWindowTitle("Quantum Flux")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	game := game.NewGame()

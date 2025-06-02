@@ -3,12 +3,13 @@ package scenes
 import (
 	"image/color"
 	"math"
+	"qflux/pkg/config"
 )
 
 func (s *TitleScene) Update() error {
 	s.next = TitleSceneId // default to this scene
 	for _, star := range s.stars {
-		if err := star.Update(320, 240); err != nil { // FIXME hardcode
+		if err := star.Update(config.ScreenWidth, config.ScreenHeight); err != nil {
 			return err
 		}
 	}

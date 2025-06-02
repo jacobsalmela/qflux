@@ -2,7 +2,7 @@ package scenes
 
 import (
 	"image/color"
-	"rpg-tutorial/menu"
+	"qflux/menu"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

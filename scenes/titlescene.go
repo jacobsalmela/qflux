@@ -2,8 +2,9 @@ package scenes
 
 import (
 	"image/color"
-	"rpg-tutorial/assets/audio/sfx"
-	"rpg-tutorial/menu"
+	"qflux/assets/audio/sfx"
+	"qflux/menu"
+	"qflux/pkg/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -41,7 +42,7 @@ func NewTitleScene() *TitleScene {
 		Index: menu.NewGame,
 	}
 
-	s.stars = initStars(50, 320, 240) // 50 stars within screen dimensions
+	s.stars = initStars(50, config.ScreenWidth, config.ScreenHeight) // 50 stars within screen dimensions
 
 	return s
 }

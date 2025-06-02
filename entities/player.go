@@ -1,8 +1,8 @@
 package entities
 
 import (
-	"rpg-tutorial/animations"
-	"rpg-tutorial/components"
+	"qflux/animations"
+	"qflux/components"
 )
 
 type PlayerState uint8

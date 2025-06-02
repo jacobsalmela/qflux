@@ -1,8 +1,8 @@
 package scenes
 
 import (
-	"rpg-tutorial/assets/audio/music"
-	"rpg-tutorial/assets/audio/sfx"
+	"qflux/assets/audio/music"
+	"qflux/assets/audio/sfx"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

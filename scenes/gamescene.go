@@ -6,8 +6,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
-	"rpg-tutorial/constants"
-	"rpg-tutorial/entities"
+	"qflux/constants"
+	"qflux/entities"
 )
 
 type GameScene struct {

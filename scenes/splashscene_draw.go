@@ -2,6 +2,7 @@ package scenes
 
 import (
 	"math"
+	"qflux/pkg/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
@@ -14,8 +15,8 @@ func (s *SplashScene) Draw(screen *ebiten.Image) {
 	for _, splash := range s.images {
 		// calculate the scaling factor since images may be different sizes
 		imgWidth, imgHeight := splash.Bounds().Dx(), splash.Bounds().Dy()
-		scaleX := float64(320) / float64(imgWidth)
-		scaleY := float64(240) / float64(imgHeight)
+		scaleX := float64(config.ScreenWidth) / float64(imgWidth)
+		scaleY := float64(config.ScreenHeight) / float64(imgHeight)
 
 		// use the smaller of the two to maintain aspect ratio
 		scale := math.Min(scaleX, scaleY)
@@ -25,8 +26,8 @@ func (s *SplashScene) Draw(screen *ebiten.Image) {
 		op.GeoM.Scale(scale, scale)
 
 		// center the image on the screen
-		tx := (float64(320) - float64(imgWidth)*scale) / 2
-		ty := (float64(240) - float64(imgHeight)*scale) / 2
+		tx := (float64(config.ScreenWidth) - float64(imgWidth)*scale) / 2
+		ty := (float64(config.ScreenHeight) - float64(imgHeight)*scale) / 2
 		op.GeoM.Translate(tx, ty)
 
 		// calculate a normalized alpha value based on how much time has passed relative to the total fade-in duration

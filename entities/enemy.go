@@ -1,6 +1,6 @@
 package entities
 
-import "rpg-tutorial/components"
+import "qflux/components"
 
 type Enemy struct {
 	*Entity

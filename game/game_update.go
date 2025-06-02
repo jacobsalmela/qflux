@@ -3,7 +3,8 @@ package game
 import (
 	"fmt"
 	"os"
-	"rpg-tutorial/scenes"
+	"qflux/pkg/config"
+	"qflux/scenes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -43,7 +44,7 @@ func (g *Game) Update() error {
 
 func (g *Game) pauseCheck() {
 	if g.current.Next() == scenes.PauseSceneId {
-		freezeFrame := ebiten.NewImage(320, 240)
+		freezeFrame := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 		g.current.Draw(freezeFrame)
 		g.sceneMap[scenes.PauseSceneId].SetFreezeFrame(freezeFrame)
 	}

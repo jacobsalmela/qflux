@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	internalaudio "rpg-tutorial/assets/audio"
+	internalaudio "qflux/assets/audio"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	// "github.com/hajimehoshi/ebiten/v2/audio/wav"

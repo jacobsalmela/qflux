@@ -2,8 +2,10 @@ package scenes
 
 import (
 	"image/color"
-	"rpg-tutorial/entities"
+	"qflux/entities"
 	"sort"
+
+	"qflux/pkg/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -11,8 +13,8 @@ import (
 const (
 	cameraDepth  = 4.8 * 1.0 // looks good here, but leave adjustable
 	cameraX      = 0
-	cameraHeight = 68      // hardcoded starting value
-	horizonY     = 240 / 2 // screenheight / 2
+	cameraHeight = 68 // hardcoded starting value
+	horizonY     = config.ScreenHeight / 2
 )
 
 func initRoadSegments(qty int) []entities.Entity {
@@ -78,7 +80,7 @@ func (s *GameScene) projectPoint(worldX, worldY, worldZ, farthestZ float64) (scr
 	// 6. compute screenX: center of the screen + (lateral worldX offset)*scale
 	// cameraX is how far we panned left or right
 	// worldX of 0 is the center of road, or screenWidth /2
-	screenX = float64(320)/2 + (worldX-cameraX)*scale
+	screenX = float64(config.ScreenWidth)/2 + (worldX-cameraX)*scale
 
 	return screenX, screenY, scale
 }

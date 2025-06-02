@@ -1,5 +1,5 @@
 package constants
 
 const (
-	Tilesize = 16
+	Tilesize = 16 // FIXME: hardcode
 )

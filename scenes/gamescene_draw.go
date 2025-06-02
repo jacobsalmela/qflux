@@ -3,6 +3,8 @@ package scenes
 import (
 	"image/color"
 
+	"qflux/pkg/config"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -13,16 +15,16 @@ func (s *GameScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *GameScene) drawGround(screen *ebiten.Image) {
-	horizonY := 240 / 2 //FIXME: hardcode
+	horizonY := config.ScreenHeight / 2
 	groundImg := ebiten.NewImage(1, 1)
 	groundImg.Fill(color.White)
 
 	// each vertex is a single corner in the mesh
 	verticies := []ebiten.Vertex{
 		{DstX: 0, DstY: float32(horizonY), ColorR: 0, ColorG: 0.2, ColorB: 0, ColorA: 1},
-		{DstX: float32(320), DstY: float32(horizonY), ColorR: 0, ColorG: 0.2, ColorB: 0, ColorA: 1},
-		{DstX: float32(320), DstY: float32(240), ColorR: 0, ColorG: 0.6, ColorB: 0, ColorA: 1},
-		{DstX: 0, DstY: float32(240), ColorR: 0, ColorG: 0.6, ColorB: 0, ColorA: 1},
+		{DstX: float32(config.ScreenWidth), DstY: float32(horizonY), ColorR: 0, ColorG: 0.2, ColorB: 0, ColorA: 1},
+		{DstX: float32(config.ScreenWidth), DstY: float32(config.ScreenHeight), ColorR: 0, ColorG: 0.6, ColorB: 0, ColorA: 1},
+		{DstX: 0, DstY: float32(config.ScreenHeight), ColorR: 0, ColorG: 0.6, ColorB: 0, ColorA: 1},
 	}
 
 	// the indicies tell ebitengine how to group them into triangles
@@ -63,7 +65,7 @@ func (s *GameScene) drawSky(screen *ebiten.Image) {
 			ColorA: 1,
 		},
 		{
-			DstX:   float32(320),
+			DstX:   float32(config.ScreenWidth),
 			DstY:   0,
 			ColorR: topR,
 			ColorG: topG,
@@ -71,8 +73,8 @@ func (s *GameScene) drawSky(screen *ebiten.Image) {
 			ColorA: 1,
 		},
 		{
-			DstX:   float32(320),
-			DstY:   float32(240),
+			DstX:   float32(config.ScreenWidth),
+			DstY:   float32(config.ScreenHeight),
 			ColorR: bottomRightR,
 			ColorG: bottomRightG,
 			ColorB: bottomRightB,
@@ -80,7 +82,7 @@ func (s *GameScene) drawSky(screen *ebiten.Image) {
 		},
 		{
 			DstX:   0,
-			DstY:   float32(240),
+			DstY:   float32(config.ScreenWidth),
 			ColorR: bottomLeftR,
 			ColorG: bottomLeftG,
 			ColorB: bottomLeftB,
