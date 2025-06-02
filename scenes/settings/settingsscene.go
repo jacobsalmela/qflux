@@ -1,40 +1,50 @@
-package scenes
+package settings
 
 import (
 	"qflux/assets/audio/sfx"
 	"qflux/menu"
+	"qflux/scenes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type SettingsScene struct {
-	scene
+	scenes.Base
 	elapsed float64
 }
 
-var _ Scene = (*SettingsScene)(nil)
+var _ scenes.Scene = (*SettingsScene)(nil)
 
-func NewSettingsScene() *SettingsScene {
+func NewScene() scenes.Scene {
 	s := &SettingsScene{
-		scene: scene{
-			loaded: false,
-			id:     SettingsId,
-			next:   SettingsId,
+		Base: scenes.Base{
+			Loaded: false,
+			Id:     scenes.SettingsId,
+			Next:   scenes.SettingsId,
+			Name:   "Settings",
 		},
 	}
 
-	s.menu = &menu.Menu{
+	s.Menu = &menu.Menu{
 		Items: []menu.MenuItem{
 			// FIXME: add scenes for these, or should there be multiple menus instead?
-			{Label: "Difficulty", Action: func() { s.next = SettingsId }},
-			{Label: "Controls", Action: func() { s.next = SettingsId }},
-			{Label: "Audio Video", Action: func() { s.next = SettingsId }},
-			{Label: "Accessibility", Action: func() { s.next = SettingsId }},
+			{Label: "Difficulty", Action: func() { s.Next = scenes.SettingsId }},
+			{Label: "Controls", Action: func() { s.Next = scenes.SettingsId }},
+			{Label: "Audio Video", Action: func() { s.Next = scenes.SettingsId }},
+			{Label: "Accessibility", Action: func() { s.Next = scenes.SettingsId }},
 		},
 		Index: menu.Settings,
 	}
 
 	return s
+}
+
+func init() {
+	scenes.Register(scenes.SettingsId, NewScene)
+}
+
+func (s *SettingsScene) Slug() string {
+	return s.Name
 }
 
 func (s *SettingsScene) Init() error {
@@ -45,12 +55,12 @@ func (s *SettingsScene) Init() error {
 	if err := sfx.Sounds["Menu Confirm"].Init(); err != nil {
 		panic("failed to initialize sound")
 	}
-	s.loaded = true
+	s.Loaded = true
 	return nil
 }
 
 func (s *SettingsScene) IsLoaded() bool {
-	return s.loaded
+	return s.Loaded
 }
 
 func (s *SettingsScene) OnEnter() error {
@@ -61,14 +71,14 @@ func (s *SettingsScene) OnExit() error {
 	return nil
 }
 
-func (s *SettingsScene) ID() SceneId {
-	return s.id
+func (s *SettingsScene) GetID() scenes.Id {
+	return s.Id
 }
 
-func (s *SettingsScene) Next() SceneId {
-	return s.next
+func (s *SettingsScene) GetNext() scenes.Id {
+	return s.Next
 }
 
 func (s *SettingsScene) SetFreezeFrame(screen *ebiten.Image) {
-	s.freezeFrame = screen
+	s.FreezeFrame = screen
 }

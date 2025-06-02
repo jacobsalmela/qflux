@@ -1,4 +1,4 @@
-package scenes
+package gameplay
 
 import (
 	"image"
@@ -8,22 +8,24 @@ import (
 
 	"qflux/constants"
 	"qflux/entities"
+	"qflux/scenes"
 )
 
 type GameScene struct {
-	scene
+	scenes.Base
 	Player entities.Entity
 	Road   []entities.Entity
 }
 
-var _ Scene = (*GameScene)(nil)
+var _ scenes.Scene = (*GameScene)(nil)
 
-func NewGameScene() *GameScene {
+func NewScene() scenes.Scene {
 	return &GameScene{
-		scene: scene{
-			loaded: false,
-			id:     GameSceneId,
-			next:   GameSceneId,
+		Base: scenes.Base{
+			Loaded: false,
+			Id:     scenes.GameId,
+			Next:   scenes.GameId,
+			Name:   "Gameplay",
 		},
 		Player: entities.Entity{ // TODO: needs constructor function
 			X: 0,
@@ -34,13 +36,21 @@ func NewGameScene() *GameScene {
 	}
 }
 
+func init() {
+	scenes.Register(scenes.GameId, NewScene)
+}
+
+func (s *GameScene) Slug() string {
+	return s.Name
+}
+
 func (s *GameScene) IsLoaded() bool {
-	return s.loaded
+	return s.Loaded
 }
 
 func (s *GameScene) Init() error {
 
-	s.loaded = true
+	s.Loaded = true
 	return nil
 }
 
@@ -55,32 +65,32 @@ func (s *GameScene) OnExit() error {
 func (s *GameScene) Update() error {
 	// "T" will temporarily trigger a game over
 	if inpututil.IsKeyJustPressed(ebiten.KeyT) {
-		s.next = GameOverSceneId
+		s.Next = scenes.GameOverId
 		return nil
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-		s.next = ExitSceneId
+		s.Next = scenes.ExitId
 		return nil
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.next = PauseSceneId
+		s.Next = scenes.PauseId
 		return nil
 	}
 
-	s.next = GameSceneId
+	s.Next = scenes.GameId
 	return nil
 }
 
-func (s *GameScene) ID() SceneId {
-	return s.id
+func (s *GameScene) GetID() scenes.Id {
+	return s.Id
 }
 
-func (s *GameScene) Next() SceneId {
-	return s.next
+func (s *GameScene) GetNext() scenes.Id {
+	return s.Next
 }
 
 func (s *GameScene) SetFreezeFrame(screen *ebiten.Image) {
-	s.freezeFrame = screen
+	s.FreezeFrame = screen
 }
 
 func CheckCollisionHorizontal(sprite *entities.Entity, colliders []image.Rectangle) {

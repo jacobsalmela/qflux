@@ -1,4 +1,4 @@
-package scenes
+package title
 
 import (
 	"image/color"
@@ -31,5 +31,5 @@ func (s *TitleScene) drawTitle(screen *ebiten.Image) {
 func (s *TitleScene) drawMenu(screen *ebiten.Image) {
 	x := float64(config.ScreenWidth / 2)
 	y := float64(75) //FIXME: hardcode
-	s.menu.Draw(screen, x, y, fonts.RobotoMediumFontFace, color.RGBA{R: 0, G: 0, B: 125, A: 255})
+	s.Menu.Draw(screen, x, y, fonts.RobotoMediumFontFace, color.RGBA{R: 0, G: 0, B: 125, A: 255})
 }

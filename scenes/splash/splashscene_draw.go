@@ -1,4 +1,4 @@
-package scenes
+package splash
 
 import (
 	"math"

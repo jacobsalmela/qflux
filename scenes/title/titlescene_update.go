@@ -1,19 +1,20 @@
-package scenes
+package title
 
 import (
 	"image/color"
 	"math"
 	"qflux/pkg/config"
+	"qflux/scenes"
 )
 
 func (s *TitleScene) Update() error {
-	s.next = TitleSceneId // default to this scene
+	s.Next = scenes.TitleId // default to this scene
 	for _, star := range s.stars {
 		if err := star.Update(config.ScreenWidth, config.ScreenHeight); err != nil {
 			return err
 		}
 	}
-	if err := s.menu.Update(); err != nil {
+	if err := s.Menu.Update(); err != nil {
 		return err
 	}
 
@@ -40,5 +41,5 @@ func (s *TitleScene) calculateBgColor() color.RGBA {
 	t := (tCycle - float64(segmentIndex)*segmentDuration) / segmentDuration
 
 	// interpolate between the current and next color
-	return lerpColor(colors[segmentIndex], colors[nextIndex], t)
+	return scenes.LerpColor(colors[segmentIndex], colors[nextIndex], t)
 }

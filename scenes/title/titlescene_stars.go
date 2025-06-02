@@ -1,4 +1,4 @@
-package scenes
+package title
 
 import (
 	"image/color"

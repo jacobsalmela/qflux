@@ -1,8 +1,9 @@
-package scenes
+package splash
 
 import (
 	"bytes"
 	"qflux/assets/images/thirdparty"
+	"qflux/scenes"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,23 +12,32 @@ import (
 )
 
 type SplashScene struct {
-	scene
+	scenes.Base
 	images     []*ebiten.Image
 	elapsed    float64
 	fadeInTime time.Duration
 }
 
-var _ Scene = (*SplashScene)(nil)
+var _ scenes.Scene = (*SplashScene)(nil)
 
-func NewSplashScene() *SplashScene {
+func NewScene() scenes.Scene {
 	return &SplashScene{
-		scene: scene{
-			loaded: false,
-			id:     SplashSceneId,
-			next:   SplashSceneId,
+		Base: scenes.Base{
+			Loaded: false,
+			Id:     scenes.SplashId,
+			Next:   scenes.SplashId,
+			Name:   "Splash",
 		},
 		fadeInTime: 4 * time.Second,
 	}
+}
+
+func init() {
+	scenes.Register(scenes.SplashId, NewScene)
+}
+
+func (s *SplashScene) Slug() string {
+	return s.Name
 }
 
 func (s *SplashScene) Init() error {
@@ -45,12 +55,12 @@ func (s *SplashScene) Init() error {
 		// append it to the list of images to display
 		s.images = append(s.images, splash)
 	}
-	s.loaded = true
+	s.Loaded = true
 	return nil
 }
 
 func (s *SplashScene) IsLoaded() bool {
-	return s.loaded
+	return s.Loaded
 }
 
 func (s *SplashScene) OnEnter() error {
@@ -64,22 +74,22 @@ func (s *SplashScene) OnExit() error {
 func (s *SplashScene) Update() error {
 	s.elapsed += 0.1
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.next = TitleSceneId
+		s.Next = scenes.TitleId
 		return nil
 	}
 
-	s.next = SplashSceneId
+	s.Next = scenes.SplashId
 	return nil
 }
 
-func (s *SplashScene) ID() SceneId {
-	return s.id
+func (s *SplashScene) GetID() scenes.Id {
+	return s.Id
 }
 
-func (s *SplashScene) Next() SceneId {
-	return s.next
+func (s *SplashScene) GetNext() scenes.Id {
+	return s.Next
 }
 
 func (s *SplashScene) SetFreezeFrame(screen *ebiten.Image) {
-	s.freezeFrame = screen
+	s.FreezeFrame = screen
 }

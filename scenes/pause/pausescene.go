@@ -1,26 +1,36 @@
-package scenes
+package pause
 
 import (
 	"qflux/assets/audio/music"
 	"qflux/assets/audio/sfx"
+	"qflux/scenes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type PauseScene struct {
-	scene
+	scenes.Base
 }
 
-var _ Scene = (*PauseScene)(nil)
+var _ scenes.Scene = (*PauseScene)(nil)
 
-func NewPauseScene() *PauseScene {
+func NewScene() scenes.Scene {
 	return &PauseScene{
-		scene: scene{
-			loaded: false,
-			id:     PauseSceneId,
-			next:   PauseSceneId,
+		Base: scenes.Base{
+			Loaded: false,
+			Id:     scenes.PauseId,
+			Next:   scenes.PauseId,
+			Name:   "Pause",
 		},
 	}
+}
+
+func init() {
+	scenes.Register(scenes.PauseId, NewScene)
+}
+
+func (s *PauseScene) Slug() string {
+	return s.Name
 }
 
 func (s *PauseScene) Init() error {
@@ -32,12 +42,12 @@ func (s *PauseScene) Init() error {
 	if err != nil {
 		return err
 	}
-	s.loaded = true
+	s.Loaded = true
 	return nil
 }
 
 func (s *PauseScene) IsLoaded() bool {
-	return s.loaded
+	return s.Loaded
 }
 
 func (s *PauseScene) OnEnter() error {
@@ -55,14 +65,14 @@ func (s *PauseScene) OnExit() error {
 	return nil
 }
 
-func (s *PauseScene) ID() SceneId {
-	return s.id
+func (s *PauseScene) GetID() scenes.Id {
+	return s.Id
 }
 
-func (s *PauseScene) Next() SceneId {
-	return s.next
+func (s *PauseScene) GetNext() scenes.Id {
+	return s.Next
 }
 
 func (s *PauseScene) SetFreezeFrame(screen *ebiten.Image) {
-	s.freezeFrame = screen
+	s.FreezeFrame = screen
 }

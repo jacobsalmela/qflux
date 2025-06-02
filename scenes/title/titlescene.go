@@ -1,16 +1,17 @@
-package scenes
+package title
 
 import (
 	"image/color"
 	"qflux/assets/audio/sfx"
 	"qflux/menu"
 	"qflux/pkg/config"
+	"qflux/scenes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type TitleScene struct {
-	scene
+	scenes.Base
 	elapsed float64
 	stars   []*Star
 }
@@ -22,22 +23,23 @@ type Star struct {
 	Clr    color.Color
 }
 
-var _ Scene = (*TitleScene)(nil)
+var _ scenes.Scene = (*TitleScene)(nil)
 
-func NewTitleScene() *TitleScene {
+func NewScene() scenes.Scene {
 	s := &TitleScene{
-		scene: scene{
-			loaded: false,
-			id:     TitleSceneId,
-			next:   TitleSceneId,
+		Base: scenes.Base{
+			Loaded: false,
+			Id:     scenes.TitleId,
+			Next:   scenes.TitleId,
+			Name:   "Title",
 		},
 	}
 
-	s.menu = &menu.Menu{
+	s.Menu = &menu.Menu{
 		Items: []menu.MenuItem{
-			{Label: "New Game", Action: func() { s.next = GameSceneId }},
-			{Label: "Settings", Action: func() { s.next = SettingsId }},
-			{Label: "High Scores", Action: func() { s.next = HighScoresId }},
+			{Label: "New Game", Action: func() { s.Next = scenes.GameId }},
+			{Label: "Settings", Action: func() { s.Next = scenes.SettingsId }},
+			{Label: "High Scores", Action: func() { s.Next = scenes.HighScoresId }},
 		},
 		Index: menu.NewGame,
 	}
@@ -45,6 +47,14 @@ func NewTitleScene() *TitleScene {
 	s.stars = initStars(50, config.ScreenWidth, config.ScreenHeight) // 50 stars within screen dimensions
 
 	return s
+}
+
+func init() {
+	scenes.Register(scenes.TitleId, NewScene)
+}
+
+func (s *TitleScene) Slug() string {
+	return s.Name
 }
 
 func (s *TitleScene) Init() error {
@@ -55,12 +65,12 @@ func (s *TitleScene) Init() error {
 	if err := sfx.Sounds["Menu Confirm"].Init(); err != nil {
 		return err
 	}
-	s.loaded = true
+	s.Loaded = true
 	return nil
 }
 
 func (s *TitleScene) IsLoaded() bool {
-	return s.loaded
+	return s.Loaded
 }
 
 func (s *TitleScene) OnEnter() error {
@@ -71,14 +81,14 @@ func (s *TitleScene) OnExit() error {
 	return nil
 }
 
-func (s *TitleScene) ID() SceneId {
-	return s.id
+func (s *TitleScene) GetID() scenes.Id {
+	return s.Id
 }
 
-func (s *TitleScene) Next() SceneId {
-	return s.next
+func (s *TitleScene) GetNext() scenes.Id {
+	return s.Next
 }
 
 func (s *TitleScene) SetFreezeFrame(screen *ebiten.Image) {
-	s.freezeFrame = screen
+	s.FreezeFrame = screen
 }

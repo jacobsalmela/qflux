@@ -17,17 +17,17 @@ func (g *Game) Update() error {
 	}
 
 	// if the current scene is not the same as the next, a switch is happening
-	if g.current.ID() != g.current.Next() {
+	if g.current.GetID() != g.current.GetNext() {
 		// pause logic
 		g.pauseCheck()
 
 		// Exit the existing scene
-		if err := g.sceneMap[g.current.ID()].OnExit(); err != nil {
+		if err := g.sceneMap[g.current.GetID()].OnExit(); err != nil {
 			return err
 		}
 
 		// Switch scenes
-		g.current = g.sceneMap[g.current.Next()]
+		g.current = g.sceneMap[g.current.GetNext()]
 
 		// Enter the next scene
 		if err := g.current.OnEnter(); err != nil {
@@ -43,9 +43,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) pauseCheck() {
-	if g.current.Next() == scenes.PauseSceneId {
+	if g.current.GetNext() == scenes.PauseId {
 		freezeFrame := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 		g.current.Draw(freezeFrame)
-		g.sceneMap[scenes.PauseSceneId].SetFreezeFrame(freezeFrame)
+		g.sceneMap[scenes.PauseId].SetFreezeFrame(freezeFrame)
 	}
 }

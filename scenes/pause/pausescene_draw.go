@@ -1,4 +1,4 @@
-package scenes
+package pause
 
 import (
 	"image/color"
@@ -10,8 +10,8 @@ import (
 )
 
 func (s *PauseScene) Draw(screen *ebiten.Image) {
-	if s.freezeFrame != nil {
-		screen.DrawImage(s.freezeFrame, nil)
+	if s.FreezeFrame != nil {
+		screen.DrawImage(s.FreezeFrame, nil)
 	}
 	s.drawPausedText(screen)
 }

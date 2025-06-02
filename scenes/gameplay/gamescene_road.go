@@ -1,8 +1,9 @@
-package scenes
+package gameplay
 
 import (
 	"image/color"
 	"qflux/entities"
+	"qflux/scenes"
 	"sort"
 
 	"qflux/pkg/config"
@@ -27,7 +28,7 @@ func initRoadSegments(qty int) []entities.Entity {
 	// loop qty times to space segments evenly
 	for i := 0; i < qty; i++ {
 		t := float64(i) / float64(qty-1)
-		baseZ := lerp(uint8(startZ), uint8(endZ), t)
+		baseZ := scenes.Lerp(uint8(startZ), uint8(endZ), t)
 		// clamp baseZ to prevent overshoot
 		if baseZ < uint8(startZ) {
 			baseZ = uint8(startZ)

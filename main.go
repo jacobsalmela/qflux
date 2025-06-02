@@ -4,6 +4,12 @@ import (
 	"log"
 	"qflux/game"
 	"qflux/pkg/config"
+	_ "qflux/scenes/gameover"
+	_ "qflux/scenes/gameplay"
+	_ "qflux/scenes/pause"
+	_ "qflux/scenes/settings"
+	_ "qflux/scenes/splash"
+	_ "qflux/scenes/title"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
