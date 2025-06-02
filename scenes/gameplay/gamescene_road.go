@@ -3,7 +3,7 @@ package gameplay
 import (
 	"image/color"
 	"qflux/entities"
-	"qflux/scenes"
+	"qflux/pkg/pseudo"
 	"sort"
 
 	"qflux/pkg/config"
@@ -28,23 +28,23 @@ func initRoadSegments(qty int) []entities.Entity {
 	// loop qty times to space segments evenly
 	for i := 0; i < qty; i++ {
 		t := float64(i) / float64(qty-1)
-		baseZ := scenes.Lerp(uint8(startZ), uint8(endZ), t)
+		baseZ := pseudo.LerpF(startZ, endZ, t)
 		// clamp baseZ to prevent overshoot
-		if baseZ < uint8(startZ) {
-			baseZ = uint8(startZ)
+		if baseZ < startZ {
+			baseZ = startZ
 		}
-		if baseZ > uint8(endZ) {
-			baseZ = uint8(endZ)
+		if baseZ > endZ {
+			baseZ = endZ
 		}
 
 		// create a new segment
 		segmentImg := ebiten.NewImage(1, 1)
 		segmentImg.Fill(color.White)
 		segment := entities.Entity{
-			X:   0,          // center-line
-			Y:   0,          // flat on the road
-			Z:   float64(i), // segment's depth in the world
-			Img: segmentImg, // 1x1 pixel, tinted later
+			X:   0,              // center-line
+			Y:   0,              // flat on the road
+			Z:   float64(baseZ), // segment's depth in the world
+			Img: segmentImg,     // 1x1 pixel, tinted later
 		}
 		// add the segment to the slice
 		segments = append(segments, segment)
@@ -102,7 +102,7 @@ func (s *GameScene) drawRoad(screen *ebiten.Image) {
 		return segments[i].Z > segments[j].Z
 	})
 
-	for _, segment := range segments {
+	for i, segment := range segments {
 		if segment.Z <= s.Player.Z {
 			continue
 		}
@@ -111,18 +111,52 @@ func (s *GameScene) drawRoad(screen *ebiten.Image) {
 		}
 
 		sxTop, syTop, scaleTop := s.projectPoint(0, 0, segment.Z, trackLength)
-		sxBot, syBot, _ := s.projectPoint(0, 0, segment.Z+segmentLength, trackLength)
+		sxBot, syBot, scaleBot := s.projectPoint(0, 0, segment.Z+segmentLength, trackLength)
 
 		leftTop := sxTop - (roadWidth / 2 * scaleTop)
 		rightTop := sxTop + (roadWidth / 2 * scaleTop)
-		leftBot := sxBot - (roadWidth / 2 * scaleTop)
-		rightBot := sxBot + (roadWidth / 2 * scaleTop)
+		leftBot := sxBot - (roadWidth / 2 * scaleBot)
+		rightBot := sxBot + (roadWidth / 2 * scaleBot)
 
+		var segmentColor color.RGBA
+		if i%2 == 0 {
+			segmentColor = color.RGBA{192, 192, 192, 255}
+		} else {
+			segmentColor = color.RGBA{80, 80, 80, 255}
+		}
 		verticies := []ebiten.Vertex{
-			{DstX: float32(leftTop), DstY: float32(syTop), ColorR: float32(192.0 / 255), ColorG: float32(192.0 / 255), ColorB: float32(192.0 / 255), ColorA: 1},
-			{DstX: float32(rightTop), DstY: float32(syTop), ColorR: float32(192.0 / 255), ColorG: float32(192.0 / 255), ColorB: float32(192.0 / 255), ColorA: 1},
-			{DstX: float32(rightBot), DstY: float32(syBot), ColorR: float32(64.0 / 255), ColorG: float32(64.0 / 255), ColorB: float32(64.0 / 255), ColorA: 1},
-			{DstX: float32(leftBot), DstY: float32(syBot), ColorR: float32(64.0 / 255), ColorG: float32(64.0 / 255), ColorB: float32(64.0 / 255), ColorA: 1},
+			{
+				DstX:   float32(leftTop),
+				DstY:   float32(syTop),
+				ColorR: float32(segmentColor.R) / 255,
+				ColorG: float32(segmentColor.G) / 255,
+				ColorB: float32(segmentColor.B) / 255,
+				ColorA: 1,
+			},
+			{
+				DstX:   float32(rightTop),
+				DstY:   float32(syTop),
+				ColorR: float32(segmentColor.R) / 255,
+				ColorG: float32(segmentColor.G) / 255,
+				ColorB: float32(segmentColor.B) / 255,
+				ColorA: 1,
+			},
+			{
+				DstX:   float32(rightBot),
+				DstY:   float32(syBot),
+				ColorR: float32(segmentColor.R) / 255,
+				ColorG: float32(segmentColor.G) / 255,
+				ColorB: float32(segmentColor.B) / 255,
+				ColorA: 1,
+			},
+			{
+				DstX:   float32(leftBot),
+				DstY:   float32(syBot),
+				ColorR: float32(segmentColor.R) / 255,
+				ColorG: float32(segmentColor.G) / 255,
+				ColorB: float32(segmentColor.B) / 255,
+				ColorA: 1,
+			},
 		}
 
 		indicies := []uint16{0, 1, 2, 0, 2, 3}

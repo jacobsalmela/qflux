@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"math"
 	"qflux/pkg/config"
+	"qflux/pkg/pseudo"
 	"qflux/scenes"
 )
 
@@ -41,5 +42,5 @@ func (s *TitleScene) calculateBgColor() color.RGBA {
 	t := (tCycle - float64(segmentIndex)*segmentDuration) / segmentDuration
 
 	// interpolate between the current and next color
-	return scenes.LerpColor(colors[segmentIndex], colors[nextIndex], t)
+	return pseudo.LerpColor(colors[segmentIndex], colors[nextIndex], t)
 }
