@@ -2,6 +2,7 @@ package gameplay
 
 import (
 	"image"
+	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -13,7 +14,7 @@ import (
 
 type GameScene struct {
 	scenes.Base
-	Player entities.Entity
+	Player entities.Player
 	Road   []entities.Entity
 }
 
@@ -27,14 +28,33 @@ func NewScene() scenes.Scene {
 			Next:   scenes.GameId,
 			Name:   "Gameplay",
 		},
-		Player: entities.Entity{ // TODO: needs constructor function
-			X: 0,
-			Y: 0,
-			Z: 0,
+		Player: entities.Player{ // TODO: needs constructor function
+			Entity: &entities.Entity{
+				X: 0,
+				Y: 0,
+				Z: 0,
+			},
+			Speed: 0.0, // start game in stopped state
 		},
 		Road: initRoadSegments(1000),
 	}
 }
+
+const (
+	// fixed timestep: ebitengine's Update() always runs at 60 TPS
+	dt = 1.0 / 60.0
+
+	// forward motion (units in m/s2)
+	forwardAccel    = 90.0    // acceleration when "w" is pressed
+	forwardDecel    = 50.0    // natural deceleration (friction) when no key is pressed
+	brakeDecel      = 90.0    // braking deceleration when "s" is pressed while moving
+	maxForwardSpeed = 56.8224 // m/s 96.5606 km/h ~= 26.8224 m/s
+
+	// reverse motion
+	reverseAccel    = 90.0 // reverse acceleration
+	maxReverseSpeed = 90.0 // max reverse speed FIXME
+
+)
 
 func init() {
 	scenes.Register(scenes.GameId, NewScene)
@@ -77,6 +97,38 @@ func (s *GameScene) Update() error {
 		return nil
 	}
 
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		// accelerate forward
+		s.Player.Speed += forwardAccel * dt
+		if s.Player.Speed > maxForwardSpeed {
+			s.Player.Speed = maxForwardSpeed
+		}
+	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
+		// accelerate in reverse if speed is zero or negative
+		s.Player.Speed -= reverseAccel * dt
+		if s.Player.Speed < -maxReverseSpeed {
+			s.Player.Speed = -maxReverseSpeed
+		}
+	} else {
+		// no forward or reverse input; apply natural deceleration toward 0
+		if s.Player.Speed > 0 {
+			s.Player.Speed -= forwardDecel * dt
+			if s.Player.Speed < 0 {
+				s.Player.Speed = 0
+			}
+		} else if s.Player.Speed < 0 {
+			// if reversing, decelerate toward 0 (reduce reverse speed)
+			s.Player.Speed += forwardDecel * dt
+			if s.Player.Speed > 0 {
+				s.Player.Speed = 0
+			}
+		}
+	}
+
+	// update player position
+	s.Player.Z += s.Player.Speed * dt
+
+	log.Printf("Speed: %.3f m/s, Position: %.3f", s.Player.Speed, s.Player.Z)
 	s.Next = scenes.GameId
 	return nil
 }

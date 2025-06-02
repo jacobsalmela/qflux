@@ -16,6 +16,7 @@ const (
 
 type Player struct {
 	*Entity
+	Speed      float64
 	Health     uint
 	Animations map[PlayerState]*animations.Animation
 	CombatComp *components.BasicCombat
