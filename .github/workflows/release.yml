@@ -22,7 +22,7 @@ jobs:
       - name: build binary
         run: |
           mkdir -p bin
-          go build -o bin/qflux ./...
+          go build -o bin/qflux .
 
       - name: create github release
         id: create_release
