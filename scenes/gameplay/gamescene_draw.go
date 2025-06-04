@@ -12,6 +12,27 @@ func (s *GameScene) Draw(screen *ebiten.Image) {
 	s.drawSky(screen)
 	s.drawGround(screen)
 	s.drawRoad(screen)
+	s.drawPlayer(screen)
+}
+
+func (s *GameScene) drawPlayer(screen *ebiten.Image) {
+	opts := &ebiten.DrawImageOptions{}
+	// get sprite's dimensions
+	w := s.Player.Img.Bounds().Dx()
+	h := s.Player.Img.Bounds().Dy()
+
+	scale := 0.8
+
+	// compute final w/h
+	sw := float64(w) * scale
+	sh := float64(h) * scale
+
+	offsetX := float64(config.ScreenWidth)/2 - float64(sw)/2
+	offsetY := float64(config.ScreenHeight) - float64(sh)
+
+	opts.GeoM.Scale(scale, scale)
+	opts.GeoM.Translate(offsetX, offsetY)
+	screen.DrawImage(s.Player.Img, opts)
 }
 
 func (s *GameScene) drawGround(screen *ebiten.Image) {

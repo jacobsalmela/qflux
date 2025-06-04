@@ -1,12 +1,15 @@
 package gameplay
 
 import (
+	"bytes"
+	"fmt"
 	"image"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
+	"qflux/assets/images/vehicles"
 	"qflux/constants"
 	"qflux/entities"
 	"qflux/scenes"
@@ -76,6 +79,12 @@ func (s *GameScene) Init() error {
 }
 
 func (s *GameScene) OnEnter() error {
+	var err error
+	playerImageImage, _, err := image.Decode(bytes.NewReader(vehicles.Gtr))
+	if err != nil {
+		return fmt.Errorf("failed to decode player image: %v", err)
+	}
+	s.Player.Img = ebiten.NewImageFromImage(playerImageImage)
 	return nil
 }
 
