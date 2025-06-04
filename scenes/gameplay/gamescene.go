@@ -34,7 +34,8 @@ func NewScene() scenes.Scene {
 				Y: 0,
 				Z: 0,
 			},
-			Speed: 0.0, // start game in stopped state
+			Speed:        0.0, // start game in stopped state
+			LateralSpeed: 350.0,
 		},
 		Road: initRoadSegments(1000),
 	}
@@ -123,6 +124,14 @@ func (s *GameScene) Update() error {
 				s.Player.Speed = 0
 			}
 		}
+	}
+
+	// move left or right
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		s.Player.X -= s.Player.LateralSpeed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		s.Player.X += s.Player.LateralSpeed * dt
 	}
 
 	// update player position

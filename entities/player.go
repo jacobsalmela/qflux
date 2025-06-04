@@ -16,10 +16,11 @@ const (
 
 type Player struct {
 	*Entity
-	Speed      float64
-	Health     uint
-	Animations map[PlayerState]*animations.Animation
-	CombatComp *components.BasicCombat
+	Speed        float64
+	LateralSpeed float64
+	Health       uint
+	Animations   map[PlayerState]*animations.Animation
+	CombatComp   *components.BasicCombat
 }
 
 func (p *Player) ActiveAnimation(dx, dy int) *animations.Animation {
