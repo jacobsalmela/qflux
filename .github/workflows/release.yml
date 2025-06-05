@@ -19,6 +19,14 @@ jobs:
         with:
           go-version: '1.24'
 
+      - name: install ebiten/glfw and alsa headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev \
+            libasound2-dev \
+            pkg-config
+
       - name: build binary
         run: |
           mkdir -p bin
