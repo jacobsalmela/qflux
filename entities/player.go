@@ -2,6 +2,7 @@ package entities
 
 import (
 	"qflux/animations"
+	"qflux/camera"
 	"qflux/components"
 )
 
@@ -16,6 +17,7 @@ const (
 
 type Player struct {
 	*Entity
+	*camera.Camera
 	Speed        float64
 	LateralSpeed float64
 	Health       uint

@@ -9,7 +9,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
+	"qflux/assets/images/billboards"
 	"qflux/assets/images/vehicles"
+	"qflux/camera"
 	"qflux/constants"
 	"qflux/entities"
 	"qflux/scenes"
@@ -17,8 +19,9 @@ import (
 
 type GameScene struct {
 	scenes.Base
-	Player entities.Player
-	Road   []entities.Entity
+	Player     entities.Player
+	Road       []entities.Entity
+	Billboards []entities.Entity
 }
 
 var _ scenes.Scene = (*GameScene)(nil)
@@ -32,6 +35,7 @@ func NewScene() scenes.Scene {
 			Name:   "Gameplay",
 		},
 		Player: entities.Player{ // TODO: needs constructor function
+			Camera: camera.NewCamera(0, 0, 0, 68, 4.8),
 			Entity: &entities.Entity{
 				X: 0,
 				Y: 0,
@@ -41,6 +45,13 @@ func NewScene() scenes.Scene {
 			LateralSpeed: 350.0,
 		},
 		Road: initRoadSegments(1000),
+		Billboards: []entities.Entity{
+			{
+				X: 250, // off to the right a bit
+				Y: 20,  // slightly off the ground
+				Z: 100,
+			},
+		},
 	}
 }
 
@@ -80,11 +91,17 @@ func (s *GameScene) Init() error {
 
 func (s *GameScene) OnEnter() error {
 	var err error
+	// FIXME: loop all assets
 	playerImageImage, _, err := image.Decode(bytes.NewReader(vehicles.Gtr))
 	if err != nil {
 		return fmt.Errorf("failed to decode player image: %v", err)
 	}
 	s.Player.Img = ebiten.NewImageFromImage(playerImageImage)
+	billboardImageImage, _, err := image.Decode(bytes.NewReader(billboards.Ebitengine))
+	if err != nil {
+		return fmt.Errorf("failed to decode billboard image: %v", err)
+	}
+	s.Billboards[0].Img = ebiten.NewImageFromImage(billboardImageImage)
 	return nil
 }
 
@@ -137,16 +154,16 @@ func (s *GameScene) Update() error {
 
 	// move left or right
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		s.Player.X -= s.Player.LateralSpeed * dt
+		s.Player.Camera.X -= s.Player.LateralSpeed * dt
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		s.Player.X += s.Player.LateralSpeed * dt
+		s.Player.Camera.X += s.Player.LateralSpeed * dt
 	}
 
 	// update player position
-	s.Player.Z += s.Player.Speed * dt
+	s.Player.Camera.Z += s.Player.Speed * dt
 
-	log.Printf("Speed: %.3f m/s, Position: %.3f", s.Player.Speed, s.Player.Z)
+	log.Printf("Speed: %.3f m/s, Position: %.3f", s.Player.Speed, s.Player.Camera.Z)
 	s.Next = scenes.GameId
 	return nil
 }

@@ -3,13 +3,18 @@ package camera
 import "math"
 
 type Camera struct {
-	X, Y float64
+	X, Y, Z float64
+	Focal   float64
+	Depth   float64
 }
 
-func NewCamera(x, y float64) *Camera {
+func NewCamera(x, y, z, focal, depth float64) *Camera {
 	return &Camera{
-		X: x,
-		Y: y,
+		X:     x,
+		Y:     y,
+		Z:     z,
+		Focal: focal,
+		Depth: depth,
 	}
 }
 
